@@ -8,18 +8,27 @@ function App() {
   const [count, setCount] = useState(0)
 
   const getTasks = async () => {
+    try{
+
     const data = await axios.get("http://localhost:8000/tasks")
     console.log(data);
+  }catch{
+    console.log("error");
+  }
+  }
+
+  const getTask = async (id: number) => {
+    try{
+      const data = await axios.get(`http://localhost:8000/tasks/${id}`)
+      console.log(data);
+    }catch{
+      console.log("error");
+    }
   }
 
   useEffect( () => {
     void (async () => {
-      try{
         await getTasks();
-        console.log("success");
-      }catch{
-        console.log("error");
-      }
     })();
   },[])
 
@@ -35,7 +44,10 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+        <button onClick={async () => {
+            await getTask(count);
+            setCount((count) => count + 1);
+        }}>
           count is {count}
         </button>
         <p>
