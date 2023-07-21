@@ -19,3 +19,15 @@ class TaskView(APIView):
         task = Task.objects.filter(id=id)
         serializer = TaskSerializer(task, many=True)
         return Response(serializer.data)
+    
+    def put(self, request, id, *args, **kwargs):
+        data = request.data
+        task = Task.objects.filter(id=id).first()
+        task.edited_at = Task.edit()
+        serializer = TaskSerializer(instance=task, data=data)
+
+        if serializer.is_valid():
+            serializer.save()
+
+        return Response(serializer.data)
+

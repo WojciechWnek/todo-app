@@ -8,4 +8,17 @@ class Task(models.Model):
     description = models.CharField(max_length=500)
     done = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    edited_at = models.DateTimeField(auto_now=True)
+    edited_at = models.DateTimeField(null=True, blank=True, editable=False)
+
+    # def save(self, *args, **kwargs):
+    #     if not self._state.adding:
+    #         from datetime import datetime
+    #         self.edited_at = datetime.now()
+
+    #     super().save(*args, **kwargs)
+
+    def edit():
+        from datetime import datetime
+        return datetime.now()
+        
+        

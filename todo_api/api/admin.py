@@ -6,6 +6,7 @@ from .models import Task
 
 
 class TaskAdmin(admin.ModelAdmin):
+    readonly_fields=("edited_at",)
     list_display = ("title", "description")
 
 
