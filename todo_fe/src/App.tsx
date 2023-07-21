@@ -1,9 +1,15 @@
 import { useEffect, useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
 import './App.css';
 import axios from 'axios';
 import { TaskCard } from './components/TaskCard/TaskCard';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+} from '@mui/material';
 
 interface ITasks {
   createdAt: string;
@@ -15,24 +21,42 @@ interface ITasks {
 }
 
 function App() {
-  const [count, setCount] = useState(0);
   const [tasks, setTasks] = useState<ITasks[]>([]);
+  const [open, setOpen] = useState(false);
+  const [titleValue, setTitleValue] = useState('');
+  const [descriptionValue, setDescriptionValue] = useState('');
 
-  const getTasks = async () => {
-    try {
-      const response = await axios.get('http://localhost:8000/tasks/');
-      console.log(response.data);
-      setTasks(response.data as ITasks[]);
-    } catch {
-      console.log('error');
-    }
+  const handleClickOpen = () => {
+    setOpen(true);
   };
 
-  const getTask = (id: number) => {
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const addTask = () => {
     void (async () => {
       try {
-        const data = await axios.get(`http://localhost:8000/tasks/${id}/`);
-        console.log(data);
+        await axios.post('http://localhost:8000/tasks/', {
+          title: titleValue,
+          description: descriptionValue,
+          done: false,
+        });
+        getTasks();
+        handleClose();
+        setTitleValue('');
+        setDescriptionValue('');
+      } catch {
+        console.log('error');
+      }
+    })();
+  };
+
+  const getTasks = () => {
+    void (async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/tasks/');
+        setTasks(response.data as ITasks[]);
       } catch {
         console.log('error');
       }
@@ -40,9 +64,7 @@ function App() {
   };
 
   useEffect(() => {
-    void (async () => {
-      await getTasks();
-    })();
+    getTasks();
   }, []);
 
   return (
@@ -56,8 +78,49 @@ function App() {
           createdAt={task.createdAt}
           editedAt={task.editedAt}
           title={task.title}
+          getTasks={getTasks}
         />
       ))}
+      <Button variant="contained" onClick={handleClickOpen} sx={{ marginTop: 4 }}>
+        Add Task
+      </Button>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Add new task</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="title"
+            label="Title"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={titleValue}
+            onChange={(e) => {
+              console.log(e.currentTarget);
+              setTitleValue(e.currentTarget.value);
+            }}
+          />
+          <TextField
+            autoFocus
+            margin="dense"
+            id="description"
+            label="Description"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={descriptionValue}
+            onChange={(e) => {
+              console.log(e.currentTarget);
+              setDescriptionValue(e.currentTarget.value);
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={() => addTask()}>Add</Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

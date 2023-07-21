@@ -9,7 +9,7 @@ import {
   Typography,
 } from '@mui/material';
 import axios from 'axios';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 interface ITaskCard {
   createdAt: string;
@@ -18,9 +18,18 @@ interface ITaskCard {
   editedAt: string;
   id: number;
   title: string;
+  getTasks: () => void;
 }
 
-export const TaskCard = ({ title, createdAt, description, id, done, editedAt }: ITaskCard) => {
+export const TaskCard = ({
+  title,
+  createdAt,
+  description,
+  id,
+  done,
+  editedAt,
+  getTasks,
+}: ITaskCard) => {
   const [isEditting, setIsEditting] = useState(false);
   const [descriptionValue, setDescriptionValue] = useState<string>(description);
   const [titleValue, setTitleValue] = useState<string>(title);
@@ -28,17 +37,28 @@ export const TaskCard = ({ title, createdAt, description, id, done, editedAt }: 
   const editTask = (id: number) => {
     void (async () => {
       try {
-        const data = await axios.put(`http://localhost:8000/tasks/${id}/`, {
+        await axios.put(`http://localhost:8000/tasks/${id}/`, {
           description: descriptionValue,
           title: titleValue,
           createdAt: createdAt,
           done: done,
         });
-        console.log(data);
+        getTasks();
       } catch {
         console.log('error');
       } finally {
         setIsEditting(false);
+      }
+    })();
+  };
+
+  const deleteTask = (id: number) => {
+    void (async () => {
+      try {
+        await axios.delete(`http://localhost:8000/tasks/${id}/`);
+        getTasks();
+      } catch {
+        console.log('error');
       }
     })();
   };
@@ -81,6 +101,11 @@ export const TaskCard = ({ title, createdAt, description, id, done, editedAt }: 
                 onChange={(e) => setDescriptionValue(e.currentTarget.value)}
               />
             )}
+            {editedAt && (
+              <Typography align="right" variant="caption">
+                Last edit: {new Date(editedAt).toLocaleString()}
+              </Typography>
+            )}
           </Grid>
           <Grid item>
             {!isEditting ? (
@@ -88,7 +113,9 @@ export const TaskCard = ({ title, createdAt, description, id, done, editedAt }: 
             ) : (
               <Button onClick={() => editTask(id)}>Save</Button>
             )}
-            <Button color="error">Delete</Button>
+            <Button color="error" onClick={() => deleteTask(id)}>
+              Delete
+            </Button>
           </Grid>
         </Grid>
       </AccordionDetails>
