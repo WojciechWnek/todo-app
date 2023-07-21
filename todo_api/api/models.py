@@ -10,15 +10,13 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     edited_at = models.DateTimeField(null=True, blank=True, editable=False)
 
-    # def save(self, *args, **kwargs):
-    #     if not self._state.adding:
-    #         from datetime import datetime
-    #         self.edited_at = datetime.now()
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            from datetime import datetime
+            self.edited_at = datetime.now()
 
-    #     super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
-    def edit():
-        from datetime import datetime
-        return datetime.now()
+
         
         
