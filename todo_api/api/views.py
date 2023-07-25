@@ -13,7 +13,7 @@ class TasksView(APIView):
         tasks = Task.objects.all()
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
-    
+
     def post(self, request):
         data = request.data
         serializer = TaskSerializer(data=data)
@@ -24,13 +24,12 @@ class TasksView(APIView):
         return Response(serializer.data)
 
 
-
 class TaskView(APIView):
     def get(self, request, id, *args, **kwargs):
         task = Task.objects.filter(id=id)
         serializer = TaskSerializer(task, many=True)
         return Response(serializer.data)
-    
+
     def put(self, request, id, *args, **kwargs):
         data = request.data
         task = Task.objects.filter(id=id).first()
@@ -40,9 +39,18 @@ class TaskView(APIView):
             serializer.save()
 
         return Response(serializer.data)
-    
+
     def delete(self, request, id):
         task = Task.objects.filter(id=id).first()
         task.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    def patch(self, request, id):
+        data = request.data
+        task = Task.objects.filter(id=id).first()
+        serializer = TaskSerializer(instance=task, data=data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+
+        return Response(serializer.data)

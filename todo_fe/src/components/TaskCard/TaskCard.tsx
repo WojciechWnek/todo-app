@@ -34,14 +34,27 @@ export const TaskCard = ({
   const [descriptionValue, setDescriptionValue] = useState<string>(description);
   const [titleValue, setTitleValue] = useState<string>(title);
 
+  const markAsDone = (id: number) => {
+    void (async () => {
+      try {
+        await axios.patch(`http://localhost:8000/tasks/${id}/`, {
+          done: !done,
+        });
+        getTasks();
+      } catch {
+        console.log('error');
+      } finally {
+        setIsEditting(false);
+      }
+    })();
+  };
+
   const editTask = (id: number) => {
     void (async () => {
       try {
         await axios.put(`http://localhost:8000/tasks/${id}/`, {
           description: descriptionValue,
           title: titleValue,
-          createdAt: createdAt,
-          done: done,
         });
         getTasks();
       } catch {
@@ -65,8 +78,21 @@ export const TaskCard = ({
 
   return (
     <Accordion>
-      <AccordionSummary aria-controls="panel2a-content" id="panel2a-header">
-        <Grid container justifyContent={'space-between'} columnGap={20}>
+      <AccordionSummary
+        aria-controls="panel2a-content"
+        id="panel2a-header"
+        sx={{
+          textDecoration: done ? 'line-through' : 'none',
+          backgroundColor: done ? '#e6ffe3' : 'unset',
+        }}
+      >
+        <Grid
+          container
+          justifyContent={'space-between'}
+          columnGap={20}
+          flexWrap={'nowrap'}
+          alignItems={'center'}
+        >
           <Grid item>
             {!isEditting ? (
               <Typography align="left">{titleValue}</Typography>
@@ -80,8 +106,20 @@ export const TaskCard = ({
               />
             )}
           </Grid>
-          <Grid item>
-            <Typography align="right">{new Date(createdAt).toLocaleString()}</Typography>
+          <Grid item container columnGap={3} alignItems={'center'}>
+            <Grid item>
+              <Typography align="right">{new Date(createdAt).toLocaleString()}</Typography>
+            </Grid>
+            <Grid item>
+              <Checkbox
+                checked={done}
+                onClick={(e) => {
+                  // setIsDone((prevState) => !prevState);
+                  markAsDone(id);
+                  e.stopPropagation();
+                }}
+              />
+            </Grid>
           </Grid>
         </Grid>
       </AccordionSummary>

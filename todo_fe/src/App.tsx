@@ -98,7 +98,7 @@ function App() {
             value={titleValue}
             onChange={(e) => {
               console.log(e.currentTarget);
-              setTitleValue(e.currentTarget.value);
+              setTitleValue(e.currentTarget.value as string);
             }}
           />
           <TextField
@@ -112,7 +112,7 @@ function App() {
             value={descriptionValue}
             onChange={(e) => {
               console.log(e.currentTarget);
-              setDescriptionValue(e.currentTarget.value);
+              setDescriptionValue(e.currentTarget.value as string);
             }}
           />
         </DialogContent>
