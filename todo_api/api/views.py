@@ -1,12 +1,13 @@
 from django.http import HttpResponse
 from rest_framework.views import APIView
 from .models import Task
-from .serializers import TaskSerializer
+from .serializers import TaskSerializer, UserSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
 from rest_framework import viewsets
 
+from django.contrib.auth.models import User
 # Create your views here.
 
 
@@ -75,3 +76,8 @@ from rest_framework import viewsets
 class TaskVeiwSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer

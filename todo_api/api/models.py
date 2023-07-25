@@ -9,6 +9,8 @@ class Task(models.Model):
     done = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     edited_at = models.DateTimeField(null=True, blank=True, editable=False)
+    owner = models.ForeignKey(
+        'auth.User', related_name='task', on_delete=models.CASCADE, default=None)
 
     # Override modles save method with my own
     def save(self, *args, **kwargs):
