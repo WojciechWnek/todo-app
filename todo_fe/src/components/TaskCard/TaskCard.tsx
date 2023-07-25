@@ -106,7 +106,7 @@ export const TaskCard = ({
               />
             )}
           </Grid>
-          <Grid item container columnGap={3} alignItems={'center'}>
+          <Grid item container columnGap={3} alignItems={'center'} justifyContent={'space-between'}>
             <Grid item>
               <Typography align="right">{new Date(createdAt).toLocaleString()}</Typography>
             </Grid>
