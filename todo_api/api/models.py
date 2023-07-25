@@ -10,13 +10,10 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     edited_at = models.DateTimeField(null=True, blank=True, editable=False)
 
+    # Override modles save method with my own
     def save(self, *args, **kwargs):
         if not self._state.adding:
             from datetime import datetime
             self.edited_at = datetime.now()
 
         super().save(*args, **kwargs)
-
-
-        
-        
