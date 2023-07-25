@@ -5,6 +5,7 @@ from .serializers import TaskSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
+from rest_framework import viewsets
 
 # Create your views here.
 
@@ -25,9 +26,9 @@ from rest_framework import generics
 #         return Response(serializer.data)
 
 # This is the same as code above
-class TasksView(generics.ListCreateAPIView):
-    queryset = Task.objects.all()
-    serializer_class = TaskSerializer
+# class TasksView(generics.ListCreateAPIView):
+#     queryset = Task.objects.all()
+#     serializer_class = TaskSerializer
 
 
 # class TaskView(APIView):
@@ -64,8 +65,13 @@ class TasksView(generics.ListCreateAPIView):
 
 # This is the same as code above
 
-class TaskView(generics.RetrieveUpdateDestroyAPIView):
+# class TaskView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Task.objects.all()
+#     serializer_class = TaskSerializer
+#     # by default it should be "pk" and it also should be changed to "pk" in urls.py
+#     lookup_field = "id"
+
+
+class TaskVeiwSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    # by default it should be "pk" and it also should be changed to "pk" in urls.py
-    lookup_field = "id"
