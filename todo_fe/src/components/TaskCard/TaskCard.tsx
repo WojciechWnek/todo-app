@@ -114,7 +114,6 @@ export const TaskCard = ({
               <Checkbox
                 checked={done}
                 onClick={(e) => {
-                  // setIsDone((prevState) => !prevState);
                   markAsDone(id);
                   e.stopPropagation();
                 }}

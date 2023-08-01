@@ -7,70 +7,13 @@ from rest_framework import status
 from rest_framework import generics
 from rest_framework import viewsets
 
-from django.contrib.auth.models import User
-# Create your views here.
-
-
-# class TasksView(APIView):
-#     def get(self, request, *args, **kwargs):
-#         tasks = Task.objects.all()
-#         serializer = TaskSerializer(tasks, many=True)
-#         return Response(serializer.data)
-
-#     def post(self, request):
-#         data = request.data
-#         serializer = TaskSerializer(data=data)
-
-#         if serializer.is_valid():
-#             serializer.save()
-
-#         return Response(serializer.data)
-
-# This is the same as code above
-# class TasksView(generics.ListCreateAPIView):
-#     queryset = Task.objects.all()
-#     serializer_class = TaskSerializer
-
-
-# class TaskView(APIView):
-#     def get(self, request, id, *args, **kwargs):
-#         task = Task.objects.filter(id=id)
-#         serializer =
-# (task, many=True)
-#         return Response(serializer.data)
-
-#     def put(self, request, id, *args, **kwargs):
-#         data = request.data
-#         task = Task.objects.filter(id=id).first()
-#         serializer = TaskSerializer(instance=task, data=data)
-
-#         if serializer.is_valid():
-#             serializer.save()
-
-#         return Response(serializer.data)
-
-#     def delete(self, request, id):
-#         task = Task.objects.filter(id=id).first()
-#         task.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
-
-#     def patch(self, request, id):
-#         data = request.data
-#         task = Task.objects.filter(id=id).first()
-#         serializer = TaskSerializer(instance=task, data=data, partial=True)
-
-#         if serializer.is_valid():
-#             serializer.save()
-
-#         return Response(serializer.data)
-
-# This is the same as code above
-
-# class TaskView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Task.objects.all()
-#     serializer_class = TaskSerializer
-#     # by default it should be "pk" and it also should be changed to "pk" in urls.py
-#     lookup_field = "id"
+from django.contrib.auth import get_user_model, login, logout
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .serializers import UserRegisterSerializer, UserLoginSerializer, UserSerializer
+from rest_framework import permissions, status
+from .validations import custom_validation, validate_email, validate_password
 
 
 class TaskVeiwSet(viewsets.ModelViewSet):
@@ -78,6 +21,49 @@ class TaskVeiwSet(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+class UserRegister(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request):
+        clean_data = custom_validation(request.data)
+        serializer = UserRegisterSerializer(data=clean_data)
+        if serializer.is_valid(raise_exception=True):
+            user = serializer.create(clean_data)
+            if user:
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserLogin(APIView):
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = (SessionAuthentication,)
+    ##
+
+    def post(self, request):
+        data = request.data
+        assert validate_email(data)
+        assert validate_password(data)
+        serializer = UserLoginSerializer(data=data)
+        if serializer.is_valid(raise_exception=True):
+            user = serializer.check_user(data)
+            login(request, user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserLogout(APIView):
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = ()
+
+    def post(self, request):
+        logout(request)
+        return Response(status=status.HTTP_200_OK)
+
+
+class UserView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (SessionAuthentication,)
+    ##
+
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response({'user': serializer.data}, status=status.HTTP_200_OK)
